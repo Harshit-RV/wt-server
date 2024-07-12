@@ -1,40 +1,28 @@
-import mongoose, { Schema, Document, ObjectId } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-export interface EarningDoc extends Document {
-  apiKey: string,
-  walletAddress: string,
-  earnings: [ EarningElementDoc ],
+export interface MonitorProps {
+  userId: string,
+  monitorUrl: string
 }
 
-export interface EarningElementDoc extends Document {
-  endpoint: string,
-  credits: number,
-  timestamp: Date,
+export interface MonitorDoc extends Document {
+  userId: string,
+  monitorUrl: string,
+  interval: number,
+  lastChecked: Date,
+  createdAt: Date,
+  updatedAt: Date,
 }
 
-export interface EarningProps {
-  apiKey: string,
-  walletAddress: string,
-  earnings: [ EarningElementProps ],
-}
-
-export interface EarningElementProps {
-  endpoint: string,
-  credits: number,
-}
-
-const earningElementSchema = new Schema({
-  endpoint: { type: String, required: true },
-  credits: { type: Number, required: true },
-  timestamp: { type: Date, default: Date.now },
+const monitorSchema: Schema = new Schema({
+  userId: { type: String, required: true },
+  monitorUrl: { type: String, required: true },
+  interval: { type: Number, required: true, default: 120},
+  lastChecked: { type: Date, default: Date.now },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
-const earningSchema: Schema = new Schema({
-  apiKey: { type: String, required: true, unique: true },
-  walletAddress: { type: String, required: true,  unique: true },
-  earnings: [ earningElementSchema ],
-});
+const Monitor = mongoose.model<MonitorDoc>('Monitors', monitorSchema);
 
-const Earning = mongoose.model<EarningDoc>('Earning', earningSchema);
-
-export default Earning;
+export default Monitor;
