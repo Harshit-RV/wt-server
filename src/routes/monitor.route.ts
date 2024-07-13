@@ -2,11 +2,44 @@ import express from 'express';
 import { getAuth, requireAuth } from '@clerk/express';
 
 import "dotenv/config";
-import { addContactToMonitor, createNewMonitor, deleteMonitor, getMonitorById, getMonitorsByUserId } from '../services/monitor.service';
+import { addContactToMonitor, createNewMonitor, deleteMonitor, getAllMonitors, getMonitorById, getMonitorsByUserId, updateStatus } from '../services/monitor.service';
 import { MonitorProps } from '../models/Monitor';
 import { get } from 'http';
+import config from '../config';
 
 const router = express.Router();
+
+router.get('/list/all', async (req, res) => {
+  const { apiKey } = req.query;
+
+  if (apiKey !== config.herokuApiKey) {
+    return res.status(403).end();
+  }
+
+  const monitors = await getAllMonitors();
+
+  return res.json(monitors);
+});
+
+router.post('/status/change', async (req, res) => {
+  const { apiKey, monitorId, status } = req.body;
+
+  if (apiKey !== config.herokuApiKey) {
+    return res.status(403).end();
+  }
+
+  if (!monitorId) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  if (typeof status !== 'boolean') {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  const output = await updateStatus(monitorId, status);
+
+  return res.json(output);
+});
 
 router.use(requireAuth);
 
@@ -49,6 +82,8 @@ router.get('/list', async (req, res) => {
 
   return res.json(monitors);
 });
+
+
 
 router.post('/delete', async (req, res) => {
   const { userId } = getAuth(req);

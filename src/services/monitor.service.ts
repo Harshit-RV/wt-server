@@ -39,3 +39,11 @@ export async function addContactToMonitor(monitorId:string, email:string) {
 export const deleteMonitor = async (id: string) => {
   return Monitor.findByIdAndDelete(id);
 }
+
+export const getAllMonitors = async () : Promise<MonitorDoc[]> => {
+  return Monitor.find({});
+}
+
+export const updateStatus = async (id: string, status: Boolean) => {
+  return Monitor.findByIdAndUpdate(id, { status }, { new: true });
+}

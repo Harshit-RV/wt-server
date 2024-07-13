@@ -1,3 +1,4 @@
+import { stat } from 'fs';
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface MonitorProps {
@@ -14,6 +15,7 @@ export interface MonitorDoc extends Document {
   createdAt: Date,
   updatedAt: Date,
   alertCondition: AlertCondition,
+  status: Boolean,
   contacts: ContactDoc[],
 }
 
@@ -40,6 +42,7 @@ const contactSchema: Schema = new Schema({
 
 const monitorSchema: Schema = new Schema({
   userId: { type: String, required: true },
+  status: { type: Boolean, required: true, default: true },
   monitorUrl: { type: String, required: true },
   interval: { type: Number, required: true, default: 180},
   lastChecked: { type: Date, default: Date.now },
