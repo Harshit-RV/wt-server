@@ -35,3 +35,7 @@ export async function addContactToMonitor(monitorId:string, email:string) {
     throw error;
   }
 }
+
+export const deleteMonitor = async (id: string) => {
+  return Monitor.findByIdAndDelete(id);
+}
