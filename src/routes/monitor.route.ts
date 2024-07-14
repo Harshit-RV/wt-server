@@ -52,13 +52,13 @@ router.post('/alert', async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  if (typeof status !== 'boolean') {
-    return res.status(400).json({ message: 'Invalid status' });
+  if (!statusCode) {
+    return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  const output = await updateStatus(monitorId, status);
+  // const output = await updateStatus(monitorId, status);
 
-  return res.json(output);
+  return res.json({ message: 'Alert sent. we will send the email' });
 });
 
 router.use(requireAuth);

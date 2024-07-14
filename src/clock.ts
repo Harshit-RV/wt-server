@@ -52,19 +52,25 @@ async function getStatusCode(endpoint: string): Promise<number> {
   }
 }
 
-const sendNotification = async (monitor: MonitorDoc, statusCode: number) => {
-  await changeStatus(monitor, false);
-
-  console.log(`Sending notification for ${monitor.monitorUrl} with status code ${statusCode}`);
+const alertMonitor = async (monitor: MonitorDoc, statusCode: number) => {
   try {
-    await axios.post(`${BASE_URL}/monitor/alert`, {
+    const res = await axios.post(`${BASE_URL}/monitor/alert`, {
       apiKey: config.herokuApiKey,
       monitorId: monitor._id,
       statusCode: statusCode
      });
+     console.log({data: res.data});
   } catch (e) {
     console.log(e);
   }
+}
+
+const sendNotification = async (monitor: MonitorDoc, statusCode: number) => {
+  await changeStatus(monitor, false);
+
+  console.log(`Sending notification for ${monitor.monitorUrl} with status code ${statusCode}`);
+  
+  await alertMonitor(monitor, statusCode);
 }
 
 
@@ -95,27 +101,23 @@ const main = async () => {
   console.log(`Time taken: ${endingTime.getTime() - startingTime.getTime()} ms`);
 }
 
-// main();
-
 cron.schedule('*/30 * * * * *', async () => {
   console.log('Running a task every 30 seconds');
   main();
 });
 
 // Schedule tasks to be run on the server.
-cron.schedule('*/3 * * * *', async () => {
-  console.log('Running a task every 3 mins');
-  try {
-    const response = await axios.get('https://9c9f1t91-3000.inc1.devtunnels.ms/notification/hit');
-    console.log(response.data);
-  } catch (error) {
-    console.error(`Error: ${error}`);
-  }
-});
 
-cron.schedule('0 0 * * *', () => {
-  console.log('Running a task every day at midnight');
-  // Add your task logic here
-});
+// cron.schedule('*/3 * * * *', async () => {
+//   console.log('Running a task every 3 mins');
+//   try {
+//     const response = await axios.get('https://9c9f1t91-3000.inc1.devtunnels.ms/notification/hit');
+//     console.log(response.data);
+//   } catch (error) {
+//     console.error(`Error: ${error}`);
+//   }
+
+//   main();
+// });
 
 console.log('Clock process started');
