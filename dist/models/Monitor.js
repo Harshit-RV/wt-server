@@ -32,6 +32,7 @@ const contactSchema = new mongoose_1.Schema({
 });
 const monitorSchema = new mongoose_1.Schema({
     userId: { type: String, required: true },
+    status: { type: Boolean, required: true, default: true },
     monitorUrl: { type: String, required: true },
     interval: { type: Number, required: true, default: 180 },
     lastChecked: { type: Date, default: Date.now },

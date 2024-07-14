@@ -1,1 +1,1 @@
-web: yarn start
+clock: node dist/clock.js

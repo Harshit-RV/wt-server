@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMonitorById = exports.getMonitorsByUserId = exports.createNewMonitor = void 0;
+exports.updateStatus = exports.getAllMonitors = exports.deleteMonitor = exports.getMonitorById = exports.getMonitorsByUserId = exports.createNewMonitor = void 0;
 exports.addContactToMonitor = addContactToMonitor;
 const Monitor_1 = __importDefault(require("../models/Monitor"));
 const createNewMonitor = async (args) => {
@@ -38,3 +38,15 @@ async function addContactToMonitor(monitorId, email) {
         throw error;
     }
 }
+const deleteMonitor = async (id) => {
+    return Monitor_1.default.findByIdAndDelete(id);
+};
+exports.deleteMonitor = deleteMonitor;
+const getAllMonitors = async () => {
+    return Monitor_1.default.find({});
+};
+exports.getAllMonitors = getAllMonitors;
+const updateStatus = async (id, status) => {
+    return Monitor_1.default.findByIdAndUpdate(id, { status }, { new: true });
+};
+exports.updateStatus = updateStatus;
