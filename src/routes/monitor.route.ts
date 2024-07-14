@@ -41,6 +41,26 @@ router.post('/status/change', async (req, res) => {
   return res.json(output);
 });
 
+router.post('/alert', async (req, res) => {
+  const { apiKey, monitorId, statusCode } = req.body;
+
+  if (apiKey !== config.herokuApiKey) {
+    return res.status(403).end();
+  }
+
+  if (!monitorId) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  if (typeof status !== 'boolean') {
+    return res.status(400).json({ message: 'Invalid status' });
+  }
+
+  const output = await updateStatus(monitorId, status);
+
+  return res.json(output);
+});
+
 router.use(requireAuth);
 
 router.post('/create', async (req, res) => {
