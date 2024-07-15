@@ -7,8 +7,10 @@ import "dotenv/config"; // To read CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY
 import { clerkMiddleware } from '@clerk/express';
 import { createClerkClient } from '@clerk/clerk-sdk-node';
 import cors from 'cors'; 
+import { Resend } from 'resend';
 
 const app: Application = express();
+export const resend = new Resend(config.resendApiKey);
 
 // Middleware
 app.use(express.json());
@@ -18,7 +20,7 @@ app.use(cors());
 // Connect to MongoDB
 mongoose.connect(config.mongoURI);
 
-const clerkClient = createClerkClient({ 
+export const clerkClient = createClerkClient({ 
   secretKey: config.clerkSecretKey, 
   publishableKey: config.clerkPublishableKey,
 });

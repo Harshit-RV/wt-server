@@ -6,6 +6,8 @@ import { addContactToMonitor, createNewMonitor, deleteMonitor, getAllMonitors, g
 import { MonitorProps } from '../models/Monitor';
 import { get } from 'http';
 import config from '../config';
+import { clerkClient, resend } from '..';
+import { statusString } from '../utils/statusString';
 
 const router = express.Router();
 
@@ -42,7 +44,7 @@ router.post('/status/change', async (req, res) => {
 });
 
 router.post('/alert', async (req, res) => {
-  const { apiKey, monitorId, statusCode } = req.body;
+  const { apiKey, monitorId, alertCondition } = req.body;
 
   if (apiKey !== config.herokuApiKey) {
     return res.status(403).end();
@@ -52,13 +54,46 @@ router.post('/alert', async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  if (!statusCode) {
+  if (!alertCondition || !['IS500', 'ISUNAVAILABLE', 'IS404', 'IS501', 'ISNOT200'].includes(alertCondition)) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  // const output = await updateStatus(monitorId, status);
+  const monitor = await getMonitorById(monitorId);
 
-  return res.json({ message: 'Alert sent. we will send the email' });
+  const response = await clerkClient.users.getUser(monitor?.userId!);
+
+  const { data, error } = await resend.emails.send({
+    from: "TowerLog <onboarding@resend.dev>",
+    to: [monitor?.contacts[0].email!],
+    subject: "Urgent: Your Website is Down!",
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2 style="color: #d9534f;">Alert: Your Website is Down</h2>
+        <p>Dear ${response.firstName},</p>
+        <p>We wanted to let you know that your website <a href="${monitor?.monitorUrl}" style="color: #337ab7;">${monitor?.monitorUrl}</a> is currently experiencing downtime. Our monitoring system detected the issue on <strong>${new Date().toLocaleString()}</strong>.</p>
+        <p>Here are the details:</p>
+        <ul>
+          <li><strong>URL:</strong> <a href="${monitor?.monitorUrl}" style="color: #337ab7;">${monitor?.monitorUrl}</a></li>
+          <li><strong>Status:</strong> ${statusString(alertCondition)}</li>
+          <li><strong>Detected At:</strong> ${new Date().toLocaleString()}</li>
+        </ul>
+
+        <p>Check more details at <a href="https://towerlog.vercel.app/" style="color: #337ab7;"> TowerLog dashboard</a>.</p>
+        <p>We recommend you to check your server and resolve the issue as soon as possible to minimize the impact on your users.</p>
+        <p>If you need further assistance, please do not hesitate to contact our support team.</p>
+        <p>Best regards,<br/>
+        TowerLog Team</p>
+        <hr style="border-top: 1px solid #dcdcdc;"/>
+        <p style="font-size: 0.9em; color: #888;">You are receiving this email because you subscribed to TowerLog alerts.</p>
+      </div>
+    `,
+  });
+
+  if (error) {
+    return res.status(400).json({ error });
+  }
+
+  return res.status(200).json({ data });
 });
 
 router.use(requireAuth);

@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 import axios from 'axios';
-import { MonitorDoc } from './models/Monitor';
+import { AlertCondition, MonitorDoc } from './models/Monitor';
 import config from './config';
 
 const BASE_URL = 'https://wt-server.onrender.com';
@@ -52,12 +52,12 @@ async function getStatusCode(endpoint: string): Promise<number> {
   }
 }
 
-const alertMonitor = async (monitor: MonitorDoc, statusCode: number) => {
+const alertMonitor = async (monitor: MonitorDoc, alertCondition: AlertCondition) => {
   try {
     const res = await axios.post(`${BASE_URL}/monitor/alert`, {
       apiKey: config.herokuApiKey,
       monitorId: monitor._id,
-      statusCode: statusCode
+      alertCondition: alertCondition
      });
      console.log({data: res.data});
   } catch (e) {
@@ -65,12 +65,11 @@ const alertMonitor = async (monitor: MonitorDoc, statusCode: number) => {
   }
 }
 
-const sendNotification = async (monitor: MonitorDoc, statusCode: number) => {
+const sendNotification = async (monitor: MonitorDoc, statusCode: number, alertCondition: AlertCondition) => {
+  if (monitor.status === false) return;
   await changeStatus(monitor, false);
-
   console.log(`Sending notification for ${monitor.monitorUrl} with status code ${statusCode}`);
-  
-  await alertMonitor(monitor, statusCode);
+  await alertMonitor(monitor, alertCondition);
 }
 
 
@@ -82,15 +81,15 @@ const main = async () => {
     const statusCode = await getStatusCode(monitor.monitorUrl);
 
     if ( monitor.alertCondition == 'ISNOT200' && statusCode !== 200) {
-      await sendNotification(monitor, statusCode);
+      await sendNotification(monitor, statusCode, 'ISNOT200');
     } else if ( monitor.alertCondition == 'IS500' && statusCode == 500) {
-      await sendNotification(monitor, statusCode);
+      await sendNotification(monitor, statusCode, 'IS500');
     } else if ( monitor.alertCondition == 'IS404' && statusCode == 404) {
-      await sendNotification(monitor, statusCode);
+      await sendNotification(monitor, statusCode, 'IS404');
     } else if ( monitor.alertCondition == 'IS501' && statusCode == 501) {
-      await sendNotification(monitor, statusCode);
+      await sendNotification(monitor, statusCode, 'IS501');
     } else if ( monitor.alertCondition == 'ISUNAVAILABLE' && ( statusCode == 503 || statusCode == 504 || statusCode == 502)) {
-      await sendNotification(monitor, statusCode);
+      await sendNotification(monitor, statusCode, 'ISUNAVAILABLE');
     } else {
       await changeStatus(monitor, true);
     }
