@@ -2,6 +2,7 @@ import express, { Application, NextFunction, Request, Response, } from 'express'
 import mongoose from 'mongoose';
 import homeRoutes from './routes/home.route';
 import monitorRoutes from './routes/monitor.route';
+import timerRoutes from './routes/timer.route';
 import config from './config';
 import "dotenv/config"; // To read CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY
 import { clerkMiddleware } from '@clerk/express';
@@ -30,6 +31,7 @@ app.use(clerkMiddleware({ clerkClient }));
 // Routes
 app.use('/', homeRoutes);
 app.use('/monitor', monitorRoutes);
+app.use('/timer', timerRoutes);
 
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
   console.error(err.stack);

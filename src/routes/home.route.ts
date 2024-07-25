@@ -1,10 +1,12 @@
 import express from 'express';
 import { clerkClient, resend } from '..';
 import { getAuth, requireAuth } from '@clerk/express';
+import { updateTimer } from '../services/timer.service';
 
 const router = express.Router();
 
 router.get('/ping', async (req, res) => {
+  await updateTimer();
   return res.status(200).json({ message: 'Thanks for pingng ' });
 });
 
@@ -21,7 +23,7 @@ router.post('/feedback', async (req, res) => {
   const user = await clerkClient.users.getUser(userId!);
 
   const { data, error } = await resend.emails.send({
-    from: "TowerLog <onboarding@resend.dev>",
+    from: "System <vigil@plutofy.live>",
     to: ['harshit.rai.verma@gmail.com'],
     subject: "You got feedback!",
     html: `
@@ -36,7 +38,7 @@ router.post('/feedback', async (req, res) => {
           <li><strong>User Email:</strong> <a style="color: #337ab7;">${user.primaryEmailAddress?.emailAddress}</a></li>
         </ul>
   
-        <p>${user.firstName} gave this feedback from their <a href="https://towerlog.vercel.app/" style="color: #337ab7;">TowerLog dashboard</a>.</p>
+        <p>${user.firstName} gave this feedback from their <a href="https://towerlog.vercel.app/" style="color: #337ab7;">Vigil dashboard</a>.</p>
         <p>We appreciate your dedication to providing excellent service. Reviewing this feedback can help you continue to improve.</p>
         <p>If you have any questions or need further assistance, please do not hesitate to contact our support team.</p>
         <p>Best regards,<br/>
