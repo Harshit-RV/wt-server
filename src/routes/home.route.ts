@@ -38,13 +38,13 @@ router.post('/feedback', async (req, res) => {
           <li><strong>User Email:</strong> <a style="color: #337ab7;">${user.primaryEmailAddress?.emailAddress}</a></li>
         </ul>
   
-        <p>${user.firstName} gave this feedback from their <a href="https://towerlog.vercel.app/" style="color: #337ab7;">Vigil dashboard</a>.</p>
+        <p>${user.firstName} gave this feedback from their <a href="https://vigil.plutofy.live/" style="color: #337ab7;">Vigil dashboard</a>.</p>
         <p>We appreciate your dedication to providing excellent service. Reviewing this feedback can help you continue to improve.</p>
         <p>If you have any questions or need further assistance, please do not hesitate to contact our support team.</p>
         <p>Best regards,<br/>
-        TowerLog Team</p>
+        Vigil Team</p>
         <hr style="border-top: 1px solid #dcdcdc;"/>
-        <p style="font-size: 0.9em; color: #888;">You are receiving this email because you subscribed to TowerLog notifications.</p>
+        <p style="font-size: 0.9em; color: #888;">You are receiving this email because you subscribed to Vigil notifications.</p>
       </div>
     `,
   });

@@ -60,7 +60,7 @@ router.post('/alert', async (req, res) => {
   const response = await clerkClient.users.getUser(monitor?.userId!);
 
   const { data, error } = await resend.emails.send({
-    from: "TowerLog <onboarding@resend.dev>",
+    from: "System <vigil@plutofy.live>",
     to: [monitor?.contacts[0].email!],
     subject: "Urgent: Your Website is Down!",
     html: `
@@ -75,13 +75,13 @@ router.post('/alert', async (req, res) => {
           <li><strong>Detected At:</strong> ${new Date().toLocaleString()}</li>
         </ul>
 
-        <p>Check more details at <a href="https://towerlog.vercel.app/" style="color: #337ab7;"> TowerLog dashboard</a>.</p>
+        <p>Check more details at <a href="https://vigil.plutofy.live/" style="color: #337ab7;"> Vigil dashboard</a>.</p>
         <p>We recommend you to check your server and resolve the issue as soon as possible to minimize the impact on your users.</p>
         <p>If you need further assistance, please do not hesitate to contact our support team.</p>
         <p>Best regards,<br/>
-        TowerLog Team</p>
+        Vigil Team</p>
         <hr style="border-top: 1px solid #dcdcdc;"/>
-        <p style="font-size: 0.9em; color: #888;">You are receiving this email because you subscribed to TowerLog alerts.</p>
+        <p style="font-size: 0.9em; color: #888;">You are receiving this email because you subscribed to Vigil alerts.</p>
       </div>
     `,
   });
