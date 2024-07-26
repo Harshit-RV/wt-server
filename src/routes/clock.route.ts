@@ -67,12 +67,12 @@ router.post('/alert', async (req, res) => {
       <div style="font-family: Arial, sans-serif; line-height: 1.6;">
         <h2 style="color: #d9534f;">Alert: Your Website is Down</h2>
         <p>Dear ${response.firstName},</p>
-        <p>We wanted to let you know that your website <a href="${monitor?.monitorUrl}" style="color: #337ab7;">${monitor?.monitorUrl}</a> is currently experiencing downtime. Our monitoring system detected the issue on <strong>${new Date().toLocaleString()}</strong>.</p>
+        <p>We wanted to let you know that your website <a href="${monitor?.monitorUrl}" style="color: #337ab7;">${monitor?.monitorUrl}</a> is currently experiencing downtime. Our monitoring system detected the issue on <strong>${new Date().toLocaleString()} UTC</strong>.</p>
         <p>Here are the details:</p>
         <ul>
           <li><strong>URL:</strong> <a href="${monitor?.monitorUrl}" style="color: #337ab7;">${monitor?.monitorUrl}</a></li>
           <li><strong>Status:</strong> ${statusString(alertCondition)}</li>
-          <li><strong>Detected At:</strong> ${new Date().toLocaleString()}</li>
+          <li><strong>Detected At:</strong> ${new Date().toLocaleString()} UTC</li>
         </ul>
 
         <p>Check more details at <a href="https://vigil.plutofy.live/" style="color: #337ab7;"> Vigil dashboard</a>.</p>
