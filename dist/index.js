@@ -9,6 +9,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const home_route_1 = __importDefault(require("./routes/home.route"));
 const monitor_route_1 = __importDefault(require("./routes/monitor.route"));
 const timer_route_1 = __importDefault(require("./routes/timer.route"));
+const clock_route_1 = __importDefault(require("./routes/clock.route"));
 const config_1 = __importDefault(require("./config"));
 require("dotenv/config"); // To read CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY
 const express_2 = require("@clerk/express");
@@ -26,6 +27,7 @@ exports.clerkClient = (0, clerk_sdk_node_1.createClerkClient)({
     secretKey: config_1.default.clerkSecretKey,
     publishableKey: config_1.default.clerkPublishableKey,
 });
+app.use('/clock', clock_route_1.default);
 app.use((0, express_2.clerkMiddleware)({ clerkClient: exports.clerkClient }));
 // Routes
 app.use('/', home_route_1.default);

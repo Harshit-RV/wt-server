@@ -7,10 +7,12 @@ const BASE_URL = 'https://wt-server.onrender.com';
 
 const getURLs = async () : Promise<MonitorDoc[] | null> => {
   try {
-    const output = await axios.get(`${BASE_URL}/monitor/list/all?apiKey=${config.herokuApiKey}`);
+    const output = await axios.get(`${BASE_URL}/clock/list/all?apiKey=${config.herokuApiKey}`);
     return output.data as MonitorDoc[];
   } catch (e) {
-    console.log(e);
+    if (axios.isAxiosError(e) && e.response) {
+      console.log('Could not get URLs because: ', e.response.status);
+    }
     return null;
   }
 }
@@ -19,13 +21,15 @@ const changeStatus = async ( monitor: MonitorDoc, status: Boolean ) : Promise<vo
   try {
     if (monitor.status === status) return;
 
-    await axios.post(`${BASE_URL}/monitor/status/change`, {
+    await axios.post(`${BASE_URL}/clock/status/change`, {
       apiKey: config.herokuApiKey,
       monitorId: monitor._id,
       status: status
      });
   } catch (e) {
-    console.log(e);
+    if (axios.isAxiosError(e) && e.response) {
+      console.log('Could not update status because: ', e.response.status);
+    }
   }
 }
 
@@ -33,8 +37,10 @@ const pingBackend = async () => {
   try {
     const response = await axios.get(`${BASE_URL}/ping`);
     console.log(response.data);
-  } catch (error) {
-    console.error(`Error: ${error}`);
+  } catch (e) {
+    if (axios.isAxiosError(e) && e.response) {
+      console.log('Could not ping backend because: ', e.response.status);
+    }
   }
 }
 
@@ -54,15 +60,17 @@ async function getStatusCode(endpoint: string): Promise<number> {
 
 const alertMonitor = async (monitor: MonitorDoc, alertCondition: AlertCondition) => {
   try {
-    const res = await axios.post(`${BASE_URL}/monitor/alert`, {
+    const res = await axios.post(`${BASE_URL}/clock/alert`, {
       apiKey: config.herokuApiKey,
       monitorId: monitor._id,
       alertCondition: alertCondition
      });
      console.log({data: res.data});
-  } catch (e) {
-    console.log(e);
-  }
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response) {
+        console.log('Could not alert because: ', e.response.status);
+      }
+    }
 }
 
 const sendNotification = async (monitor: MonitorDoc, statusCode: number, alertCondition: AlertCondition) => {
@@ -99,11 +107,6 @@ const main = async () => {
   const endingTime = new Date();
   console.log(`Time taken: ${endingTime.getTime() - startingTime.getTime()} ms`);
 }
-
-// cron.schedule('*/30 * * * * *', async () => {
-//   console.log('Running a task every 30 seconds');
-//   main();
-// });
 
 cron.schedule('*/3 * * * *', async () => {
   console.log('Running a task every 3 mins');

@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import homeRoutes from './routes/home.route';
 import monitorRoutes from './routes/monitor.route';
 import timerRoutes from './routes/timer.route';
+import clockRoutes from './routes/clock.route';
 import config from './config';
 import "dotenv/config"; // To read CLERK_SECRET_KEY and CLERK_PUBLISHABLE_KEY
 import { clerkMiddleware } from '@clerk/express';
@@ -25,6 +26,8 @@ export const clerkClient = createClerkClient({
   secretKey: config.clerkSecretKey, 
   publishableKey: config.clerkPublishableKey,
 });
+
+app.use('/clock', clockRoutes);
 
 app.use(clerkMiddleware({ clerkClient }));
 

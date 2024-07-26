@@ -9,11 +9,13 @@ const config_1 = __importDefault(require("./config"));
 const BASE_URL = 'https://wt-server.onrender.com';
 const getURLs = async () => {
     try {
-        const output = await axios_1.default.get(`${BASE_URL}/monitor/list/all?apiKey=${config_1.default.herokuApiKey}`);
+        const output = await axios_1.default.get(`${BASE_URL}/clock/list/all?apiKey=${config_1.default.herokuApiKey}`);
         return output.data;
     }
     catch (e) {
-        console.log(e);
+        if (axios_1.default.isAxiosError(e) && e.response) {
+            console.log('Could not get URLs because: ', e.response.status);
+        }
         return null;
     }
 };
@@ -21,14 +23,16 @@ const changeStatus = async (monitor, status) => {
     try {
         if (monitor.status === status)
             return;
-        await axios_1.default.post(`${BASE_URL}/monitor/status/change`, {
+        await axios_1.default.post(`${BASE_URL}/clock/status/change`, {
             apiKey: config_1.default.herokuApiKey,
             monitorId: monitor._id,
             status: status
         });
     }
     catch (e) {
-        console.log(e);
+        if (axios_1.default.isAxiosError(e) && e.response) {
+            console.log('Could not update status because: ', e.response.status);
+        }
     }
 };
 const pingBackend = async () => {
@@ -36,8 +40,10 @@ const pingBackend = async () => {
         const response = await axios_1.default.get(`${BASE_URL}/ping`);
         console.log(response.data);
     }
-    catch (error) {
-        console.error(`Error: ${error}`);
+    catch (e) {
+        if (axios_1.default.isAxiosError(e) && e.response) {
+            console.log('Could not ping backend because: ', e.response.status);
+        }
     }
 };
 async function getStatusCode(endpoint) {
@@ -57,7 +63,7 @@ async function getStatusCode(endpoint) {
 }
 const alertMonitor = async (monitor, alertCondition) => {
     try {
-        const res = await axios_1.default.post(`${BASE_URL}/monitor/alert`, {
+        const res = await axios_1.default.post(`${BASE_URL}/clock/alert`, {
             apiKey: config_1.default.herokuApiKey,
             monitorId: monitor._id,
             alertCondition: alertCondition
@@ -65,7 +71,9 @@ const alertMonitor = async (monitor, alertCondition) => {
         console.log({ data: res.data });
     }
     catch (e) {
-        console.log(e);
+        if (axios_1.default.isAxiosError(e) && e.response) {
+            console.log('Could not alert because: ', e.response.status);
+        }
     }
 };
 const sendNotification = async (monitor, statusCode, alertCondition) => {
@@ -103,10 +111,6 @@ const main = async () => {
     const endingTime = new Date();
     console.log(`Time taken: ${endingTime.getTime() - startingTime.getTime()} ms`);
 };
-// cron.schedule('*/30 * * * * *', async () => {
-//   console.log('Running a task every 30 seconds');
-//   main();
-// });
 node_cron_1.default.schedule('*/3 * * * *', async () => {
     console.log('Running a task every 3 mins');
     main();
